@@ -1,34 +1,49 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import CustomCard from "../../../../components/customCard/CustomCard";
 import CustomCardContent from "../../../../components/customCard/CustomCardContent";
 import CustomCardAction from "../../../../components/customCard/CustomCardAction";
 import CustomButton from "../../../../components/customButton/CustomButton";
 import * as Styled from "./ItemManipulation.styles";
 import Form from "./Form";
-import { useSelector } from "react-redux";
 import useActions from "../../../../hooks/useActions";
+import { useTypedSelector } from "../../../../hooks/useTypedSelector";
 import { types } from "./utils";
 
-const ItemManipulation = () => {
+type FormType = "type" | "username" | "link";
+
+interface ErrorState {
+  form: FormType | null;
+  message: string;
+}
+
+const ItemManipulation: React.FC = () => {
   const { setManipulationMode, addNewItem, setManipulationItem, editItem } =
     useActions();
-  const { mode, item } = useSelector((state) => state.manipulation);
-  const { items } = useSelector((state) => state.items);
+  const { item, mode } = useTypedSelector((state) => state.manipulation);
+  const { items } = useTypedSelector((state) => state.items);
 
-  const [error, setError] = useState({ form: "", message: "" });
+  const [error, setError] = useState<ErrorState>({ form: null, message: "" });
 
   const handleCancelManipulation = () => {
-    setManipulationMode();
-    setManipulationItem();
+    setManipulationMode(null);
+    setManipulationItem({ type: null, username: "", link: "" });
   };
 
   const handleError = () => {
     const usernameAlreadyExists = items.find(
-      (i) => i.username === item.username && item.username && item.id !== i.id
+      (i) =>
+        i.username === item.username &&
+        item.username &&
+        item.id !== i.id &&
+        item.type === i.type
     );
 
     const linkAlreadyExists = items.find(
-      (i) => i.link === item.link && item.link && item.id !== i.id
+      (i) =>
+        i.link === item.link &&
+        item.link &&
+        item.id !== i.id &&
+        item.type === i.type
     );
 
     if (!item.type) {
@@ -54,8 +69,8 @@ const ItemManipulation = () => {
 
     addNewItem(item);
     setManipulationMode(mode);
-    setManipulationItem();
-    setError({ form: "", message: "" });
+    setManipulationItem({ type: null, username: "", link: "" });
+    setError({ form: null, message: "" });
   };
 
   const handleEditItem = () => {
@@ -64,8 +79,7 @@ const ItemManipulation = () => {
     }
 
     editItem(item);
-    setManipulationMode();
-    setManipulationItem();
+    handleCancelManipulation();
   };
 
   return (
@@ -92,7 +106,9 @@ const ItemManipulation = () => {
             title={
               mode === "new"
                 ? " ثبت مسیر ارتباطی"
-                : `ویرایش مسیر ارتباطی ${types?.[item.type]?.title}`
+                : `ویرایش مسیر ارتباطی ${
+                    item?.type && types?.[item?.type]?.title
+                  }`
             }
             size="small"
             color="orange"

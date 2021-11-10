@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
-export const SidebarWrapper = styled.div`
+interface SidebarProps {
+  isOpen: boolean;
+}
+
+export const SidebarWrapper = styled.div<SidebarProps>`
   position: absolute;
   top: 0;
   bottom: 0;
@@ -11,7 +15,7 @@ export const SidebarWrapper = styled.div`
   z-index: 100;
 `;
 
-export const Sidebar = styled.div`
+export const Sidebar = styled.div<SidebarProps>`
   width: 10rem;
   height: calc(100% - 3rem);
   position: relative;

@@ -1,18 +1,23 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import CustomCard from "../../../../components/customCard/CustomCard";
 import CustomCardContent from "../../../../components/customCard/CustomCardContent";
 import * as Styled from "./ItemList.styles";
 import CustomButton from "../../../../components/customButton/CustomButton";
 import { Delete, Edit } from "@mui/icons-material";
-import { types } from "../add-edit-Item/utils";
+import { getIcon, types } from "../add-edit-Item/utils";
 import useActions from "../../../../hooks/useActions";
 import CustomDialog from "../../../../components/customDialog/CustomDialog";
+import { Item } from "../../../../types";
 
-const Item = ({ item }) => {
+interface ItemProps {
+  item: Item;
+}
+
+const ItemCell: React.FC<ItemProps> = ({ item }) => {
   const { setManipulationMode, setManipulationItem, deleteItem } = useActions();
   const [isOpen, setIsOpen] = useState(false);
 
-  const Icon = types?.[item?.type]?.icon;
+  const Icon = getIcon(item?.type || '');
 
   const handleEditMode = () => {
     setManipulationMode("edit");
@@ -25,7 +30,7 @@ const Item = ({ item }) => {
 
   const handleConfirmDelete = () => {
     setIsOpen(false);
-    deleteItem(item?.id);
+    item?.id && deleteItem(item?.id);
   };
 
   return (
@@ -39,10 +44,9 @@ const Item = ({ item }) => {
       <CustomCardContent sx={{ padding: "0", color: "#fff" }}>
         <CustomDialog
           isOpen={isOpen}
-          item={item}
-          headerTitle="آیا از تصمیم خود مطمین هستی؟"
+          headerTitle="آیا از تصمیم خود مطمئن هستید؟"
           message={`برای حذف مسیر ارتباطی '${
-            types?.[item?.type]?.title
+            item?.type && types?.[item?.type]?.title
           }' لطفا تایید را بنویسید`}
           acceptTitle="حذف"
           cancelTitle="انصراف"
@@ -55,7 +59,7 @@ const Item = ({ item }) => {
           <Styled.ItemInfoContainer>
             <Styled.ItemProp>
               <Icon />
-              {types?.[item?.type]?.title}
+              {item?.type && types?.[item?.type]?.title}
             </Styled.ItemProp>
             <Styled.ItemProp>
               <span style={{ color: "#999" }}>آیدی(ID): </span>
@@ -75,7 +79,7 @@ const Item = ({ item }) => {
               color="orange"
               variant="text"
               onClickButton={handleEditMode}
-              icon={Edit}
+              icon={<Edit />}
             />
             <CustomButton
               title="حذف"
@@ -83,7 +87,7 @@ const Item = ({ item }) => {
               color="crimson"
               variant="text"
               onClickButton={handleOpenDialog}
-              icon={Delete}
+              icon={<Delete />}
             />
           </Styled.ItemActionContainer>
         </Styled.ItemContentContainer>
@@ -92,4 +96,4 @@ const Item = ({ item }) => {
   );
 };
 
-export default Item;
+export default ItemCell;

@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
 import {
   FormControl,
   FormHelperText,
@@ -9,11 +8,21 @@ import {
 import { getIcon, socialTypes } from "./utils";
 import * as Styled from "./ItemManipulation.styles";
 import useActions from "../../../../hooks/useActions";
+import { useTypedSelector } from "../../../../hooks/useTypedSelector";
 
-const Form = ({ error }) => {
+type FormType = "type" | "username" | "link";
+
+interface FormProps {
+  error: {
+    form: FormType | null;
+    message: string;
+  };
+}
+
+const Form: React.FC<FormProps> = ({ error }) => {
   const { setManipulationItem } = useActions();
 
-  const { item } = useSelector((state) => state.manipulation);
+  const { item } = useTypedSelector((state) => state.manipulation);
 
   const [showError, setShowError] = useState(false);
 
@@ -21,7 +30,11 @@ const Form = ({ error }) => {
     setShowError(true);
   }, [error]);
 
-  const handleChangeField = (e) => {
+  type EventType = React.ChangeEvent<
+    HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement
+  >;
+
+  const handleChangeField = (e: EventType) => {
     setShowError(false);
 
     setManipulationItem({
@@ -30,7 +43,7 @@ const Form = ({ error }) => {
     });
   };
 
-  const renderError = (message) => (
+  const renderError = (message: string) => (
     <FormHelperText
       style={{
         fontFamily: "IRANSans",
@@ -49,10 +62,10 @@ const Form = ({ error }) => {
     <Styled.FormWrapper>
       <FormControl fullWidth>
         <NativeSelect
-          error={!item.type && error.form === "type"}
-          value={item?.type}
+          error={item?.type ? error.form === "type" && !item?.type : undefined}
+          value={item?.type ?? ""}
           onChange={handleChangeField}
-          IconComponent={getIcon(item?.type)}
+          IconComponent={getIcon(item?.type || "")}
           inputProps={{
             name: "type",
             id: "type",
@@ -69,7 +82,7 @@ const Form = ({ error }) => {
             </Styled.SelectOption>
           ))}
         </NativeSelect>
-        {error.form === "type" && !item.type && renderError(error.message)}
+        {error.form === "type" && !item?.type && renderError(error.message)}
       </FormControl>
       <FormControl fullWidth>
         <TextField

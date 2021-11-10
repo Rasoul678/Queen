@@ -1,5 +1,9 @@
 import styled, { css } from "styled-components";
 
+interface ItemProps {
+  isLast: boolean;
+}
+
 export const Breadcrumb = styled.div``;
 
 export const Dot = styled.span`
@@ -17,7 +21,7 @@ const lastItemCss = css`
   cursor: default;
 `;
 
-export const Item = styled.span`
+export const Item = styled.span<ItemProps>`
   cursor: pointer;
   ${({ isLast }) => isLast && lastItemCss} }
 `;

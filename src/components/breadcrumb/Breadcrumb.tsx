@@ -1,7 +1,11 @@
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import * as Styled from "./Breadcrumb.styles";
 
-const Breadcrumb = ({ items }) => {
+interface BreadcrumbProps {
+  items: string[];
+}
+
+const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
   return (
     <Styled.Breadcrumb>
       {items?.map((item, index, self) => {

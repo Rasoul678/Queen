@@ -1,8 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import * as Styled from "./Sidebar.styles";
 import { Tune, Close } from "@mui/icons-material";
 
-const Sidebar = () => {
+const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   //! Toggle sidebar.

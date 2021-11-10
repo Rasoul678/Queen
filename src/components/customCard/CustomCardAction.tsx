@@ -1,6 +1,7 @@
+import React from "react";
 import CardActions from "@mui/material/CardActions";
 
-const CustomCardAction = ({ children, ...rest }) => {
+const CustomCardAction: React.FC = ({ children, ...rest }) => {
   return <CardActions>{children}</CardActions>;
 };
 

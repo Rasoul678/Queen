@@ -1,15 +1,16 @@
+import React from "react";
 import * as Styled from "./Setting.styles";
 import Breadcrumb from "../../components/breadcrumb/Breadcrumb";
-import { useSelector } from "react-redux";
 import CustomCard from "../../components/customCard/CustomCard";
 import SettingHeader from "./items/header/SettingHeader";
 import ItemManipulation from "./items/add-edit-Item/ItemManipulation";
 import ItemList from "./items/lists/ItemList";
+import { useTypedSelector } from "../../hooks/useTypedSelector";
 
 const breadcrumbItems = ["خانه", "کاربر", "تنظیمات کاربری"];
 
-const Setting = () => {
-  const { mode } = useSelector((state) => state.manipulation);
+const Setting: React.FC = () => {
+  const {mode} = useTypedSelector((state) => state.manipulation);
 
   return (
     <Styled.SettingWrapper>

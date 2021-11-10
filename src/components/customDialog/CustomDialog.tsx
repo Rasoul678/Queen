@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -7,17 +7,31 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CustomButton from "../customButton/CustomButton";
 
-const CustomDialog = ({
-  isOpen,
-  onClose,
-  confirmValue,
-  headerTitle,
-  message,
-  acceptTitle,
-  cancelTitle,
-  onConfirm,
-  onCancel,
-}) => {
+interface CustomDialogProps {
+  isOpen: boolean;
+  confirmValue: string;
+  headerTitle: string;
+  message: string;
+  acceptTitle: string;
+  cancelTitle: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  onClose: () => void;
+}
+
+const CustomDialog: React.FC<CustomDialogProps> = (props) => {
+  const {
+    isOpen,
+    confirmValue,
+    headerTitle,
+    message,
+    acceptTitle,
+    cancelTitle,
+    onConfirm,
+    onCancel,
+    onClose,
+  } = props;
+
   const [inputValue, setInputValue] = useState("");
 
   const isConfirmed = confirmValue === inputValue.trim();
