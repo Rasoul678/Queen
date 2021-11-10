@@ -1,3 +1,6 @@
+import * as yup from "yup";
+import { Item } from "../../../../types";
+
 import {
   Instagram,
   Twitter,
@@ -38,3 +41,37 @@ export const socialTypes = Object.entries(types).map(([key, value]) => ({
   value: key,
   label: value.title,
 }));
+
+export const getValidationSchema = (items: Item[], item: Item) => {
+  return yup.object({
+    type: yup.string().required("نوع مدیا الزامیست"),
+    username: yup
+      .string()
+      .test(
+        "test-username",
+        "این آیدی موجود است",
+        (value) =>
+          !items.some(
+            (i) =>
+              item.username &&
+              i.username === value &&
+              item.id !== i.id &&
+              item.type === i.type
+          )
+      ),
+    link: yup
+      .string()
+      .test(
+        "test-link",
+        "این لینک موجود است",
+        (value) =>
+          !items.some(
+            (i) =>
+              item.link &&
+              i.link === value &&
+              item.id !== i.id &&
+              item.type === i.type
+          )
+      ),
+  });
+};

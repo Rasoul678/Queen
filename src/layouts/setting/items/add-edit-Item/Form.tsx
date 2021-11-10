@@ -1,22 +1,11 @@
-import React, { useState, useEffect } from "react";
-import {
-  FormControl,
-  FormHelperText,
-  NativeSelect,
-  TextField,
-} from "@mui/material";
-import { getIcon, socialTypes, types } from "./utils";
+import React, { useRef, useEffect } from "react";
+import { Box, FormHelperText, NativeSelect, TextField } from "@mui/material";
+import { useFormik } from "formik";
+import { getIcon, socialTypes, types, getValidationSchema } from "./utils";
 import * as Styled from "./ItemManipulation.styles";
 import useActions from "../../../../hooks/useActions";
 import { useTypedSelector } from "../../../../hooks/useTypedSelector";
 import CustomButton from "../../../../components/customButton/CustomButton";
-
-type FormType = "type" | "username" | "link";
-
-interface ErrorState {
-  form: FormType | null;
-  message: string;
-}
 
 const Form: React.FC = () => {
   const { setManipulationMode, addNewItem, setManipulationItem, editItem } =
@@ -25,20 +14,33 @@ const Form: React.FC = () => {
   const { item, mode } = useTypedSelector((state) => state.manipulation);
   const { items } = useTypedSelector((state) => state.items);
 
-  const [error, setError] = useState<ErrorState>({ form: null, message: "" });
+  const formRef = useRef<HTMLFormElement | null>(null);
 
-  const [showError, setShowError] = useState(false);
+  const formik = useFormik({
+    initialValues: {
+      type: item?.type || "",
+      username: item.username,
+      link: item.link,
+    },
+    validationSchema: getValidationSchema(items, item),
+    onSubmit: (values) => {
+      mode === "new" ? handleSaveItem() : handleEditItem();
+    },
+  });
 
   useEffect(() => {
-    setShowError(true);
-  }, [error]);
+    formik.setFieldValue("type", item?.type || "");
+    formik.setFieldValue("username", item.username);
+    formik.setFieldValue("link", item.link);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item?.id]);
 
   type EventType = React.ChangeEvent<
     HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement
   >;
 
   const handleChangeField = (e: EventType) => {
-    setShowError(false);
+    formik.handleChange(e);
 
     setManipulationItem({
       ...item,
@@ -51,55 +53,14 @@ const Form: React.FC = () => {
     setManipulationItem({ type: null, username: "", link: "" });
   };
 
-  const handleError = () => {
-    const usernameAlreadyExists = items.find(
-      (i) =>
-        i.username === item.username &&
-        item.username &&
-        item.id !== i.id &&
-        item.type === i.type
-    );
-
-    const linkAlreadyExists = items.find(
-      (i) =>
-        i.link === item.link &&
-        item.link &&
-        item.id !== i.id &&
-        item.type === i.type
-    );
-
-    if (!item.type) {
-      setError({ form: "type", message: "نوع مدیا الزامیست" });
-      return { hasError: true };
-    }
-
-    if (usernameAlreadyExists) {
-      setError({ form: "username", message: "این آیدی موجود است" });
-      return { hasError: true };
-    }
-
-    if (linkAlreadyExists) {
-      setError({ form: "link", message: "این آدرس موجود است" });
-      return { hasError: true };
-    }
-
-    return { hasError: false };
-  };
-
   const handleSaveItem = () => {
-    if (handleError().hasError) return;
-
     addNewItem(item);
     setManipulationMode(mode);
     setManipulationItem({ type: null, username: "", link: "" });
-    setError({ form: null, message: "" });
+    formik.resetForm();
   };
 
   const handleEditItem = () => {
-    if (handleError().hasError) {
-      return;
-    }
-
     editItem(item);
     handleCancelManipulation();
   };
@@ -109,9 +70,10 @@ const Form: React.FC = () => {
       style={{
         fontFamily: "IRANSans",
         textAlign: "right",
-        color: "red",
+        color: "crimson",
         position: "absolute",
-        top: "2rem",
+        top: "1.7rem",
+        fontSize: "0.9rem",
       }}
       id="component-error-text"
     >
@@ -120,14 +82,19 @@ const Form: React.FC = () => {
   );
 
   return (
-    <>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        formik.handleSubmit(e);
+      }}
+      ref={formRef}
+    >
       <Styled.FormWrapper>
-        <FormControl fullWidth>
+        <Box width="100%" position="relative">
           <NativeSelect
-            error={
-              item?.type ? error.form === "type" && !item?.type : undefined
-            }
-            value={item?.type ?? ""}
+            fullWidth
+            error={formik.touched.type && Boolean(formik.errors.type)}
+            value={formik.values.type}
             onChange={handleChangeField}
             IconComponent={getIcon(item?.type || "")}
             inputProps={{
@@ -146,11 +113,12 @@ const Form: React.FC = () => {
               </Styled.SelectOption>
             ))}
           </NativeSelect>
-          {error.form === "type" && !item?.type && renderError(error.message)}
-        </FormControl>
-        <FormControl fullWidth>
+          {renderError((formik.touched.type && formik.errors.type) || "")}
+        </Box>
+        <Box width="100%" position="relative">
           <TextField
-            error={error.form === "link" && showError}
+            fullWidth
+            error={formik.touched.link && Boolean(formik.errors.link)}
             type="text"
             inputProps={{
               name: "link",
@@ -164,13 +132,14 @@ const Form: React.FC = () => {
             variant="standard"
             size="small"
             onChange={handleChangeField}
-            value={item?.link}
+            value={formik.values.link}
           />
-          {error.form === "link" && showError && renderError(error.message)}
-        </FormControl>
-        <FormControl fullWidth>
+          {renderError((formik.touched.link && formik.errors.link) || "")}
+        </Box>
+        <Box width="100%" position="relative">
           <TextField
-            error={error.form === "username" && showError}
+            fullWidth
+            error={formik.touched.username && Boolean(formik.errors.username)}
             type="text"
             inputProps={{
               name: "username",
@@ -184,10 +153,12 @@ const Form: React.FC = () => {
             variant="standard"
             size="small"
             onChange={handleChangeField}
-            value={item?.username}
+            value={formik.values.username}
           />
-          {error.form === "username" && showError && renderError(error.message)}
-        </FormControl>
+          {renderError(
+            (formik.touched.username && formik.errors.username) || ""
+          )}
+        </Box>
       </Styled.FormWrapper>
       <Styled.ManipulationButtonsWrapper>
         <CustomButton
@@ -209,13 +180,15 @@ const Form: React.FC = () => {
           size="small"
           color="orange"
           variant="contained"
-          onClickButton={() =>
-            mode === "new" ? handleSaveItem() : handleEditItem()
-          }
+          onClickButton={() => {
+            formRef?.current?.dispatchEvent(
+              new Event("submit", { cancelable: true, bubbles: true })
+            );
+          }}
           sx={{ marginTop: "1rem", color: "#000" }}
         />
       </Styled.ManipulationButtonsWrapper>
-    </>
+    </form>
   );
 };
 

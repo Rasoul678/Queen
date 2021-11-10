@@ -5,7 +5,7 @@ export const FormWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin: 0.5rem 0 0 0;
+  margin: 0.5rem 0;
 `;
 
 export const CardTitle = styled.div`

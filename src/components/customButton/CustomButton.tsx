@@ -55,6 +55,7 @@ const CustomButton: React.FC<CustomButtonProps> = (props) => {
       onClick={handleClickButton}
       variant="text"
       size={size}
+      disabled={disabled}
       className={classes.root}
       startIcon={
         icon && cloneElement(icon, { sx: { margin: "0 -0.5rem 0 0.5rem" } })

@@ -6,6 +6,7 @@ import CustomButton from "../../../../components/customButton/CustomButton";
 import { Delete, Edit } from "@mui/icons-material";
 import { getIcon, types } from "../add-edit-Item/utils";
 import useActions from "../../../../hooks/useActions";
+import { useTypedSelector } from "../../../../hooks/useTypedSelector";
 import CustomDialog from "../../../../components/customDialog/CustomDialog";
 import { Item } from "../../../../types";
 
@@ -15,9 +16,12 @@ interface ItemProps {
 
 const ItemCell: React.FC<ItemProps> = ({ item }) => {
   const { setManipulationMode, setManipulationItem, deleteItem } = useActions();
+  const { item: manipulationItem, mode } = useTypedSelector(
+    (state) => state.manipulation
+  );
   const [isOpen, setIsOpen] = useState(false);
 
-  const Icon = getIcon(item?.type || '');
+  const Icon = getIcon(item?.type || "");
 
   const handleEditMode = () => {
     setManipulationMode("edit");
@@ -26,6 +30,10 @@ const ItemCell: React.FC<ItemProps> = ({ item }) => {
 
   const handleOpenDialog = () => {
     setIsOpen(true);
+    if (mode === "edit" && manipulationItem.id === item.id) {
+      setManipulationMode(null);
+      setManipulationItem({ type: null, username: "", link: "" });
+    }
   };
 
   const handleConfirmDelete = () => {
