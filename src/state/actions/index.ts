@@ -28,9 +28,16 @@ export interface DeleteItemAction {
   payload: string;
 }
 
+export interface GetItemsAction {
+  type: ActionType.GET_ITEMS;
+  payload: Item[];
+
+}
+
 export type Action =
   | SetModeAction
   | SetItemAction
   | AddItemAction
   | EditItemAction
-  | DeleteItemAction;
+  | DeleteItemAction
+  | GetItemsAction;

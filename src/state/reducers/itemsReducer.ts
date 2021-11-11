@@ -34,6 +34,10 @@ const itemsReducer = (
         draft.items = draft.items.filter((item) => item.id !== action.payload);
         break;
 
+      case ActionType.GET_ITEMS:
+        draft.items = action.payload;
+        break;
+
       default:
         break;
     }

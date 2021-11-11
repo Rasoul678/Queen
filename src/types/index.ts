@@ -29,7 +29,7 @@ export type Type =
 
 export interface Item {
   id?: string;
-  type?: Type | null ;
-  username?: string;
-  link?: string;
+  type: Type | null;
+  username: string | null;
+  link: string | null;
 }
