@@ -18,7 +18,7 @@ const itemsReducer = (
   produce(state, (draft) => {
     switch (action.type) {
       case ActionType.ADD_ITEM:
-        draft.items.push({ ...action.payload, id: randomId() });
+        draft.items.push(action.payload);
         break;
 
       case ActionType.EDIT_ITEM:
@@ -43,8 +43,5 @@ const itemsReducer = (
     }
   });
 
-const randomId = () => {
-  return Math.random().toString(36).substring(2, 5);
-};
 
 export default itemsReducer;
